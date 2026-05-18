@@ -96,4 +96,4 @@ class BotSettings(BaseSettings):
 
 
 bs = BotSettings()  # type: ignore
-ws = WatchdogSettings()  # type: ignore
+ws = WatchdogSettings()
