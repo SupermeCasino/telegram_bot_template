@@ -1,4 +1,5 @@
 import asyncio
+from typing import Any
 
 from pyrogram import Client
 from pyrogram.handlers import ConnectHandler, DisconnectHandler
@@ -16,7 +17,7 @@ loop = asyncio.new_event_loop()
 
 
 class Bot(Client):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(
             bs.bot_session_name,
             api_id=bs.api_id,
@@ -28,20 +29,20 @@ class Bot(Client):
             workdir=bs.bot_workdir,
         )
 
-    async def start(self, **kwargs):
+    async def start(self, **kwargs: Any) -> None:
         self.init_watchdog()
         await super().start()
         await self.set_menu()
 
-    async def stop(self, *args):
+    async def stop(self, *args: Any) -> None:
         ws.exit_flag = True
         await super().stop()
 
-    def init_watchdog(self):
+    def init_watchdog(self) -> None:
         self.add_handler(ConnectHandler(on_connect))
         self.add_handler(DisconnectHandler(on_disconnect))
 
-    async def set_menu(self):
+    async def set_menu(self) -> None:
         commands = {
             "start": "开始",
             "help": "帮助",

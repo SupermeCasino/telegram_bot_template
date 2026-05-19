@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 from urllib.parse import urlparse
 
 from pydantic import Field, field_validator
@@ -28,19 +28,19 @@ class WatchdogSettings(BaseSettings):
     exit_flag: bool = Field(default=False)
     """退出标志"""
 
-    def update_bot_restart_count(self):
+    def update_bot_restart_count(self) -> None:
         self.restart_count += 1
         os.environ["WD_RESTART_COUNT"] = str(self.restart_count)
 
-    def reset_bot_restart_count(self):
+    def reset_bot_restart_count(self) -> None:
         self.restart_count = 0
         os.environ["WD_RESTART_COUNT"] = "0"
 
-    def update_bot_disconnect_count(self):
+    def update_bot_disconnect_count(self) -> None:
         self.disconnect_count += 1
         os.environ["WD_DISCONNECT_COUNT"] = str(self.disconnect_count)
 
-    def reset_bot_disconnect_count(self):
+    def reset_bot_disconnect_count(self) -> None:
         self.disconnect_count = 0
         os.environ["WD_DISCONNECT_COUNT"] = "0"
 
@@ -61,20 +61,20 @@ class BotSettings(BaseSettings):
     bot_workdir: Path = Field(default=Path("sessions"))
     debug: bool = Field(default=False)
 
-    def model_post_init(self, __context) -> None:
+    def model_post_init(self, __context: Any) -> None:
         """模型初始化后的操作"""
         self.bot_workdir.mkdir(parents=True, exist_ok=True)
 
     @field_validator("admins", mode="before")
     @classmethod
-    def parse_admins(cls, v):
+    def parse_admins(cls, v: Any) -> list[int]:
         if isinstance(v, list):
             return [int(x) if not isinstance(x, int) else x for x in v]
         if isinstance(v, int):
             return [v]
         if isinstance(v, str):
             return [int(x.strip()) for x in v.replace(" ", "").split(",") if x.strip()]
-        return v
+        raise ValueError("Invalid admins format")
 
     @field_validator("bot_proxy", mode="before")
     @classmethod
